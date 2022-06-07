@@ -1,0 +1,137 @@
+import os.path
+
+from src.utils import fmm as face_mesh
+import numpy as np
+from tqdm import tqdm
+import cv2
+
+
+def smooth_data_moving_average(array, window):
+    arr = array
+    window_size = window
+    len_array = len(arr)
+    index = 0
+    # Initialize an empty list to store moving averages
+    moving_averages = []
+    for x in range(int(window / 2)):
+        moving_averages.append(arr[x])
+    # Loop through the array to
+    # consider every window of size 3
+    while index < len(arr) - window_size + 1:
+        # Calculate the average of current window
+        window_average = round(np.sum(arr[
+                                      index:index + window_size]) / window_size, 2)
+
+        # Store the average of current
+        # window in moving average list
+        moving_averages.append(window_average)
+
+        # Shift window to right by one position
+        index += 1
+    for y in reversed(range(int(window / 2))):
+        moving_averages.append(arr[len_array - y - 1])
+    return moving_averages
+
+
+def start(fileName, out_name, mask, shouldFlip, window_size):
+    print("Analyzing video " + fileName + " ...")
+
+    # Capture video for analyzing
+    an_cap = cv2.VideoCapture(fileName)
+
+    # Calculate total number of frame
+    total_frames = int(an_cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    # Get mesh object from face mesh module
+    mesh = face_mesh.FaceMeshModule()
+
+    # Read frame
+    success, img = an_cap.read()
+
+    # Read image width and height
+    img_height, img_width, _ = img.shape
+
+    # Initialize output video writer
+    writer = cv2.VideoWriter(out_name, cv2.VideoWriter_fourcc(*'DIVX'), 20, (img_width, img_height))
+
+    """Data Array Initialization"""
+    x_angle_list = []
+    y_angle_list = []
+    tilt_angle_list = []
+    t_w_list = []
+    t_h_list = []
+    o_cx_list = []
+    o_cy_list = []
+    images = []
+
+    # Re-initialize video
+    an_cap = cv2.VideoCapture(fileName)
+
+    """Get Data from Face Mesh Module"""
+    with tqdm(total=total_frames) as pbar:
+        while an_cap.isOpened():
+
+            success, img = an_cap.read()
+            if shouldFlip is True:
+                img = cv2.flip(img, 1)
+            if success:
+                x, y, tw, th, tilt_angle, ocx, ocy = mesh.get_landmark_data(img, filter_name=mask)
+
+                # Read and append the value
+                x_angle_list.append(x)
+                y_angle_list.append(y)
+                tilt_angle_list.append(tilt_angle)
+                t_w_list.append(tw)
+                t_h_list.append(th)
+                o_cx_list.append(ocx)
+                o_cy_list.append(ocy)
+                images.append(img)
+            else:
+                break
+            pbar.update(1)
+    an_cap.release()
+
+    print("Processing video " + fileName + " ...")
+
+    """Smooth the landmark data with moving average"""
+    x_angle_list = smooth_data_moving_average(x_angle_list, 3)
+    y_angle_list = smooth_data_moving_average(y_angle_list, 3)
+    tilt_angle_list = smooth_data_moving_average(tilt_angle_list, 5)
+    t_w_list = smooth_data_moving_average(t_w_list, window_size)
+    t_h_list = smooth_data_moving_average(t_h_list, window_size)
+    o_cx_list = smooth_data_moving_average(o_cx_list, window_size)
+    o_cy_list = smooth_data_moving_average(o_cy_list, window_size)
+
+    frame = 0
+
+    """Apply filter to each frame based on the mesh data"""
+    with tqdm(total=total_frames) as pbar:
+        for img in images:
+            img = mesh.applyFilter(img,
+                                   x_angle=int(x_angle_list[frame]),
+                                   y_angle=int(y_angle_list[frame]),
+                                   tiltangle=tilt_angle_list[frame],
+                                   tw=int(t_w_list[frame]),
+                                   th=int(t_h_list[frame]),
+                                   ocx=int(o_cx_list[frame]),
+                                   ocy=int(o_cy_list[frame]), filtername=mask)
+
+            frame = frame + 1
+            writer.write(img)
+            pbar.update(1)
+
+    writer.release()
+    cv2.destroyAllWindows()
+
+
+def process(file_name=os.getcwd()+'/src/sample.mp4', mask="hat"):
+    print(os.getcwd())
+    f_name = file_name.split(".")[0]
+    ext = file_name.split(".")[1]
+    out_name = f_name + "_out." + ext
+    should_flip = False
+    window_size = 3
+    start(file_name, out_name, mask, should_flip, window_size)
+
+
+process()
