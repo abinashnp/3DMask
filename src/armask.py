@@ -62,7 +62,6 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     t_h_list = []
     o_cx_list = []
     o_cy_list = []
-    images = []
 
     # Re-initialize video
     an_cap = cv2.VideoCapture(fileName)
@@ -85,7 +84,6 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
                 t_h_list.append(th)
                 o_cx_list.append(ocx)
                 o_cy_list.append(ocy)
-                images.append(img)
             else:
                 break
             pbar.update(1)
@@ -104,21 +102,34 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
 
     frame = 0
 
-    """Apply filter to each frame based on the mesh data"""
-    with tqdm(total=total_frames) as pbar:
-        for img in images:
-            img = mesh.applyFilter(img,
-                                   x_angle=int(x_angle_list[frame]),
-                                   y_angle=int(y_angle_list[frame]),
-                                   tiltangle=tilt_angle_list[frame],
-                                   tw=int(t_w_list[frame]),
-                                   th=int(t_h_list[frame]),
-                                   ocx=int(o_cx_list[frame]),
-                                   ocy=int(o_cy_list[frame]), filtername=mask)
 
-            frame = frame + 1
-            writer.write(img)
+    # Re-initialize video
+    an_cap = cv2.VideoCapture(fileName)
+
+    """Get Data from Face Mesh Module"""
+    with tqdm(total=total_frames) as pbar:
+        while an_cap.isOpened():
+
+            success, img = an_cap.read()
+            if shouldFlip is True:
+                img = cv2.flip(img, 1)
+            if success:
+                img = mesh.applyFilter(img,
+                                       x_angle=int(x_angle_list[frame]),
+                                       y_angle=int(y_angle_list[frame]),
+                                       tiltangle=tilt_angle_list[frame],
+                                       tw=int(t_w_list[frame]),
+                                       th=int(t_h_list[frame]),
+                                       ocx=int(o_cx_list[frame]),
+                                       ocy=int(o_cy_list[frame]), filtername=mask)
+
+                frame = frame + 1
+                writer.write(img)
+            else:
+                break
             pbar.update(1)
+
+    an_cap.release()
 
     writer.release()
     cv2.destroyAllWindows()
@@ -133,5 +144,3 @@ def process(file_name=os.getcwd()+'/src/sample.mp4', mask="hat"):
     window_size = 3
     start(file_name, out_name, mask, should_flip, window_size)
 
-
-process()

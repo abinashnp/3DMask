@@ -65,17 +65,11 @@ class FaceMeshModule:
 
         x = (int(xangle / 2) * 2)
         y = (int(yangle / 2) * 2)
+        fname = os.path.join(os.getcwd(), 'src', 'utils', 'imgs', str(filtername),
+                             str(filtername) + '_' + str(x) + '_' + str(y) + '.jpg')
 
-        fname = os.getcwd() + '/utils/imgs/' + str(filtername) + '/' + str(filtername) + '_' + str(x) + '_' + str(y) + '.jpg'
-
-
-        fname2 = os.getcwd() + '/utils/hat_0_0.jpg'
-        print(fname2)
-        print(os.path.isfile(fname2))
-        imgp = Image.open(fname)
-        img = np.array(imgp)
-        na = cv2.cvtColor(img, cv2.COLOR_BGR2RGBA)
-        na = cv2.cvtColor(na, cv2.COLOR_BGR2RGBA)
+        mimg = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
+        na = cv2.cvtColor(mimg, cv2.COLOR_BGR2RGB)
         alpha = np.sum(na, axis=-1) > 3
         # Convert True/False to 0/255 and change type to "uint8" to match "na"
         alpha = np.uint8(alpha * 255)
@@ -103,6 +97,7 @@ class FaceMeshModule:
         max_y = np.max(y)
 
         overlay = overlay[min_y:max_y, min_x:max_x]
+        overlay = cv2.cvtColor(overlay, cv2.COLOR_BGR2RGBA)
 
         cx = int(oCx - (overlay.shape[1] / 2))
         cy = int(oCy - (overlay.shape[0] / 2))
