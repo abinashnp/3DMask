@@ -13,7 +13,7 @@
 - Install python
 - Add python directory to the PATH at the end of installation
 
-- After completing above installation please download the source from [here](https://github.com/abinashnp/ARMaskTest/archive/refs/heads/master.zip)
+- After completing above installation please download the source from [here](https://github.com/abinashnp/3DMask/archive/refs/heads/master.zip)
 - Extract the source file into a directory
 - Command line into the directory you've just extracted the source file
 ```cd ARMaskTest```
@@ -21,6 +21,6 @@
 ```pip install -r requirements.txt```
 - Agree any conditions that the program throws at you
 - After successful installation run the program using following command
-```python main.py --folder [Folder Name] --mask [Mask Name]```
+```python main.py --file [File Name] --mask [Mask Name]```
 - You can also type following command to get help for command line instruction
 ```python main.py --help```

@@ -4,6 +4,8 @@ from src.utils import fmm as face_mesh
 import numpy as np
 from tqdm import tqdm
 import cv2
+import moviepy.editor as mp
+from moviepy.editor import *
 
 
 def smooth_data_moving_average(array, window):
@@ -36,6 +38,9 @@ def smooth_data_moving_average(array, window):
 def start(fileName, out_name, mask, shouldFlip, window_size):
     print("Analyzing video " + fileName + " ...")
 
+    video = mp.VideoFileClip(fileName)
+
+    video.audio.write_audiofile("temp.mp3")
     # Capture video for analyzing
     an_cap = cv2.VideoCapture(fileName)
 
@@ -52,7 +57,7 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     img_height, img_width, _ = img.shape
 
     # Initialize output video writer
-    writer = cv2.VideoWriter(out_name, cv2.VideoWriter_fourcc(*'DIVX'), 20, (img_width, img_height))
+    writer = cv2.VideoWriter("temp.mp4", cv2.VideoWriter_fourcc(*'DIVX'), 20, (img_width, img_height))
 
     """Data Array Initialization"""
     x_angle_list = []
@@ -102,7 +107,6 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
 
     frame = 0
 
-
     # Re-initialize video
     an_cap = cv2.VideoCapture(fileName)
 
@@ -132,10 +136,21 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     an_cap.release()
 
     writer.release()
+
+    video_clip = VideoFileClip("temp.mp4")
+    audio_clip = AudioFileClip("temp.mp3")
+
+    new_audio_clip = CompositeAudioClip([audio_clip])
+    video_clip.audio = new_audio_clip
+    video_clip.write_videofile(out_name)
+
+    os.remove("temp.mp4")
+    os.remove("temp.mp3")
+
     cv2.destroyAllWindows()
 
 
-def process(file_name=os.getcwd()+'/src/sample.mp4', mask="hat"):
+def process(file_name=os.getcwd() + 'src/sample.mp4', mask="hat"):
     print(os.getcwd())
     f_name = file_name.split(".")[0]
     ext = file_name.split(".")[1]
@@ -143,4 +158,3 @@ def process(file_name=os.getcwd()+'/src/sample.mp4', mask="hat"):
     should_flip = False
     window_size = 3
     start(file_name, out_name, mask, should_flip, window_size)
-
