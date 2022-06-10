@@ -43,6 +43,7 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     video.audio.write_audiofile("temp.mp3")
     # Capture video for analyzing
     an_cap = cv2.VideoCapture(fileName)
+    fps = an_cap.get(cv2.CAP_PROP_FPS)
 
     # Calculate total number of frame
     total_frames = int(an_cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -57,7 +58,7 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     img_height, img_width, _ = img.shape
 
     # Initialize output video writer
-    writer = cv2.VideoWriter("temp.mp4", cv2.VideoWriter_fourcc(*'DIVX'), 20, (img_width, img_height))
+    writer = cv2.VideoWriter("temp.mp4", cv2.VideoWriter_fourcc(*'DIVX'), int(fps), (img_width, img_height))
 
     """Data Array Initialization"""
     x_angle_list = []
@@ -118,14 +119,14 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
             if shouldFlip is True:
                 img = cv2.flip(img, 1)
             if success:
-                img = mesh.applyFilter(img,
-                                       x_angle=int(x_angle_list[frame]),
-                                       y_angle=int(y_angle_list[frame]),
-                                       tiltangle=tilt_angle_list[frame],
-                                       tw=int(t_w_list[frame]),
-                                       th=int(t_h_list[frame]),
-                                       ocx=int(o_cx_list[frame]),
-                                       ocy=int(o_cy_list[frame]), filtername=mask)
+                img = mesh.apply_filter(img,
+                                        x_angle=int(x_angle_list[frame]),
+                                        y_angle=int(y_angle_list[frame]),
+                                        tiltangle=tilt_angle_list[frame],
+                                        tw=int(t_w_list[frame]),
+                                        th=int(t_h_list[frame]),
+                                        ocx=int(o_cx_list[frame]),
+                                        ocy=int(o_cy_list[frame]), filtername=mask)
 
                 frame = frame + 1
                 writer.write(img)
@@ -150,7 +151,7 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     cv2.destroyAllWindows()
 
 
-def process(file_name=os.getcwd() + 'src/sample.mp4', mask="hat"):
+def process(file_name=os.getcwd() + '/sample.mp4', mask="hat"):
     print(os.getcwd())
     f_name = file_name.split(".")[0]
     ext = file_name.split(".")[1]
