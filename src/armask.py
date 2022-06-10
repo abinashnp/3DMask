@@ -43,6 +43,8 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     video.audio.write_audiofile("temp.mp3")
     # Capture video for analyzing
     an_cap = cv2.VideoCapture(fileName)
+
+    # frame per second of original video
     fps = an_cap.get(cv2.CAP_PROP_FPS)
 
     # Calculate total number of frame
