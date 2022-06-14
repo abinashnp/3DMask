@@ -40,7 +40,10 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
 
     video = mp.VideoFileClip(fileName)
 
-    video.audio.write_audiofile("temp.mp3")
+    has_audio = False
+    if(video.audio):
+        has_audio=True
+        video.audio.write_audiofile("temp.mp3")
     # Capture video for analyzing
     an_cap = cv2.VideoCapture(fileName)
 
@@ -60,7 +63,11 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     img_height, img_width, _ = img.shape
 
     # Initialize output video writer
-    writer = cv2.VideoWriter("temp.mp4", cv2.VideoWriter_fourcc(*'DIVX'), int(fps), (img_width, img_height))
+    if(has_audio):
+        writer = cv2.VideoWriter("temp.mp4", cv2.VideoWriter_fourcc(*'DIVX'), int(fps), (img_width, img_height))
+    else:
+        writer = cv2.VideoWriter(out_name, cv2.VideoWriter_fourcc(*'DIVX'), int(fps), (img_width, img_height))
+
 
     """Data Array Initialization"""
     x_angle_list = []
@@ -139,16 +146,17 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     an_cap.release()
 
     writer.release()
+    if(has_audio):
 
-    video_clip = VideoFileClip("temp.mp4")
-    audio_clip = AudioFileClip("temp.mp3")
+        video_clip = VideoFileClip("temp.mp4")
+        audio_clip = AudioFileClip("temp.mp3")
 
-    new_audio_clip = CompositeAudioClip([audio_clip])
-    video_clip.audio = new_audio_clip
-    video_clip.write_videofile(out_name)
+        new_audio_clip = CompositeAudioClip([audio_clip])
+        video_clip.audio = new_audio_clip
+        video_clip.write_videofile(out_name)
 
-    os.remove("temp.mp4")
-    os.remove("temp.mp3")
+        os.remove("temp.mp4")
+        os.remove("temp.mp3")
 
     cv2.destroyAllWindows()
 
