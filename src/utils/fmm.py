@@ -38,18 +38,19 @@ def insert_overlay(img, tiltangle, tw, th, oCx, oCy, xangle, yangle,
 
     y, x = overlay[:, :, 3].nonzero()  # get the nonzero alpha coordinates
 
-    if(trim):
+    if (trim):
         min_x = np.min(x)
         min_y = np.min(y)
         max_x = np.max(x)
         max_y = np.max(y)
 
         overlay = overlay[min_y:max_y, min_x:max_x]
+
     overlay = cv2.cvtColor(overlay, cv2.COLOR_BGR2RGBA)
 
     cx = int(oCx - (overlay.shape[1] / 2))
     cy = int(oCy - (overlay.shape[0] / 2))
-    return cv2.circle(overlay_transparent(img, overlay, cx, cy), (oCx, oCy), 2, (255, 0, 0), 2)
+    return overlay_transparent(img, overlay, cx, cy)
 
 
 class FaceMeshModule:
