@@ -24,7 +24,8 @@ def get_hat_config():
     lat_s = -0.05
     camera_eye = [0, 0.09, 1]
     trim = True
-    return modelName, albedoName, scale_factor, x_deflection, y_deflection, idA, idB, camera_eye, hor_s, ver_s, lat_s, trim
+    threshold = 8
+    return modelName, albedoName, scale_factor, x_deflection, y_deflection, idA, idB, camera_eye, hor_s, ver_s, lat_s, trim, threshold
 
 
 def get_pirate_config():
@@ -40,7 +41,8 @@ def get_pirate_config():
     lat_s = 0.15
     camera_eye = [0, 0, 1]
     trim = False
-    return modelName, albedoName, scale_factor, x_deflection, y_deflection, idA, idB, camera_eye, hor_s, ver_s, lat_s, trim
+    threshold = 3
+    return modelName, albedoName, scale_factor, x_deflection, y_deflection, idA, idB, camera_eye, hor_s, ver_s, lat_s, trim, threshold
 
 
 def get_viking_config():
@@ -56,7 +58,8 @@ def get_viking_config():
     lat_s = 0.1
     camera_eye = [0, 0.2, 1]
     trim = False
-    return modelName, albedoName, scale_factor, x_deflection, y_deflection, idA, idB, camera_eye, hor_s, ver_s, lat_s, trim
+    threshold = 20
+    return modelName, albedoName, scale_factor, x_deflection, y_deflection, idA, idB, camera_eye, hor_s, ver_s, lat_s, trim, threshold
 
 
 def get_hippie_config():
@@ -72,4 +75,5 @@ def get_hippie_config():
     lat_s = 0.1
     camera_eye = [0, 0.2, 1]
     trim = True
-    return modelName, albedoName, scale_factor, x_deflection, y_deflection, idA, idB, camera_eye, hor_s, ver_s, lat_s, trim
+    threshold = 20
+    return modelName, albedoName, scale_factor, x_deflection, y_deflection, idA, idB, camera_eye, hor_s, ver_s, lat_s, trim, threshold

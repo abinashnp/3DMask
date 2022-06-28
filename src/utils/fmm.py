@@ -8,7 +8,7 @@ from src.utils.param_calc import calculate_params
 
 
 def insert_overlay(img, tiltangle, tw, th, oCx, oCy, xangle, yangle,
-                   hor_s, ver_s, filtername, trim):
+                   hor_s, ver_s, filtername, trim, threshold):
     x = (int(xangle / 2) * 2)
     y = (int(yangle / 2) * 2)
     fname = os.path.join(os.getcwd(), 'src', 'utils', 'imgs', str(filtername),
@@ -26,7 +26,7 @@ def insert_overlay(img, tiltangle, tw, th, oCx, oCy, xangle, yangle,
     mimg = rotate_image(mimg, tiltangle)
 
     na = cv2.cvtColor(mimg, cv2.COLOR_BGR2RGB)
-    alpha = np.sum(na, axis=-1) > 5
+    alpha = np.sum(na, axis=-1) > threshold
     # Convert True/False to 0/255 and change type to "uint8" to match "na"
     alpha = np.uint8(alpha * 255)
     # Stack new alpha layer with existing image to go from BGR to BGRA, i.e. 3 channels to 4 channels
@@ -81,7 +81,7 @@ class FaceMeshModule:
 
         if results.multi_face_landmarks:
             for face_landmarks in results.multi_face_landmarks:
-                modelName, albedoName, scalefactor, xdeflection, ydeflection, idA, idB, _, _, _, lat_s, _ = filterconfig.get_config(
+                modelName, albedoName, scalefactor, xdeflection, ydeflection, idA, idB, _, _, _, lat_s, _, _ = filterconfig.get_config(
                     filter_name)
 
                 x, y, tw, th, tilt_angle, ocx, ocy = calculate_params(face_landmarks.landmark, imgWidth,
@@ -93,7 +93,7 @@ class FaceMeshModule:
         return x, y, tw, th, tilt_angle, ocx, ocy
 
     def apply_filter(self, img, x_angle, y_angle, tiltangle, tw, th, ocx, ocy, filtername="hat"):
-        modelName, albedoName, scalefactor, xdeflection, ydeflection, idA, idB, cameraeye, hor_s, ver_s, _, trim = filterconfig.get_config(
+        modelName, albedoName, scalefactor, xdeflection, ydeflection, idA, idB, cameraeye, hor_s, ver_s, _, trim, threshold = filterconfig.get_config(
             filtername)
         return insert_overlay(img=img,
                               tiltangle=tiltangle - 90,
@@ -103,5 +103,6 @@ class FaceMeshModule:
                               oCy=ocy, xangle=x_angle, yangle=y_angle, hor_s=hor_s,
                               ver_s=ver_s,
                               filtername=filtername,
-                              trim=trim
+                              trim=trim,
+                              threshold=threshold
                               )
