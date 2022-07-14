@@ -19,7 +19,7 @@ def start(mask):
     total_frames = int(an_cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # Get mesh object from face mesh module
-    mesh = face_mesh.FaceMeshModule()
+    mesh = face_mesh
 
     # Read frame
     success, img = an_cap.read()

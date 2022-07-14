@@ -41,8 +41,8 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     video = mp.VideoFileClip(fileName)
 
     has_audio = False
-    if(video.audio):
-        has_audio=True
+    if video.audio:
+        has_audio = True
         video.audio.write_audiofile("temp.mp3")
     # Capture video for analyzing
     an_cap = cv2.VideoCapture(fileName)
@@ -63,11 +63,10 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     img_height, img_width, _ = img.shape
 
     # Initialize output video writer
-    if(has_audio):
+    if has_audio:
         writer = cv2.VideoWriter("temp.mp4", cv2.VideoWriter_fourcc(*'DIVX'), int(fps), (img_width, img_height))
     else:
         writer = cv2.VideoWriter(out_name, cv2.VideoWriter_fourcc(*'DIVX'), int(fps), (img_width, img_height))
-
 
     """Data Array Initialization"""
     x_angle_list = []
@@ -146,8 +145,8 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     an_cap.release()
 
     writer.release()
-    if(has_audio):
 
+    if has_audio:
         video_clip = VideoFileClip("temp.mp4")
         audio_clip = AudioFileClip("temp.mp3")
 

@@ -17,7 +17,16 @@ def overlay_transparent(bg, overlay, px, py):
     b_width = bg.shape[1]
     b_height = bg.shape[0]
 
+    o_width = overlay.shape[1]
+    o_height = overlay.shape[0]
+
+    padding_x = min(px, b_width - px)
+    padding_y = min(py, b_height - py)
+
     nL = b_width
+
+    if padding_x < o_width / 2 or padding_y < o_height / 2:
+        nL = 0
 
     x = px + nL
     y = py + nL
@@ -54,8 +63,9 @@ def overlay_transparent(bg, overlay, px, py):
     mask = overlay[..., 3:] / 255.0
 
     background[y:y + h, x:x + w] = (1.0 - mask) * background[y:y + h, x:x + w] + mask * overlay_image
-    # cv2.bitwise_or(scene_in_logo, black_logo, mask=None)
+
     # print(background.shape)
     new_crop = background[nL:nL + b_height, nL:nL + b_width]
+
     # print(new_crop.shape)
     return new_crop
