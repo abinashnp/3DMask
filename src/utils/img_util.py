@@ -14,6 +14,12 @@ def dot(vA, vB):
 
 
 def overlay_transparent(bg, overlay, px, py):
+    if px < 0:
+        px = 0
+
+    if py < 0:
+        py = 0
+
     b_width = bg.shape[1]
     b_height = bg.shape[0]
 
@@ -62,7 +68,13 @@ def overlay_transparent(bg, overlay, px, py):
     overlay_image = overlay[..., :3]
     mask = overlay[..., 3:] / 255.0
 
-    background[y:y + h, x:x + w] = (1.0 - mask) * background[y:y + h, x:x + w] + mask * overlay_image
+    mask_1 = (1.0 - mask)
+    mask_2 = background[y:y + h, x:x + w]
+
+    mask_bg = mask_1 * mask_2
+    mask_overlay = mask * overlay_image
+
+    background[y:y + h, x:x + w] = mask_bg + mask_overlay
 
     # print(background.shape)
     new_crop = background[nL:nL + b_height, nL:nL + b_width]

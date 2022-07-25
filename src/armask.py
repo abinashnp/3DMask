@@ -6,6 +6,7 @@ from tqdm import tqdm
 import cv2
 import moviepy.editor as mp
 from moviepy.editor import *
+import ffmpeg
 
 
 def smooth_data_moving_average(array, window):
