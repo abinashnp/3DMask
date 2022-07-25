@@ -80,6 +80,15 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     # Re-initialize video
     an_cap = cv2.VideoCapture(fileName)
 
+    # Previous Data
+    p_x = 0
+    p_y = 0
+    p_tw = 0
+    p_th = 0
+    p_tilt_angle = 0
+    p_ocx = 0
+    p_ocy = 0
+
     """Get Data from Face Mesh Module"""
     with tqdm(total=total_frames) as pbar:
         while an_cap.isOpened():
@@ -91,16 +100,52 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
                 x, y, tw, th, tilt_angle, ocx, ocy = mesh.get_landmark_data(img, filter_name=mask)
 
                 # Read and append the value
-                x_angle_list.append(x)
-                y_angle_list.append(y)
-                tilt_angle_list.append(tilt_angle)
-                t_w_list.append(tw)
-                t_h_list.append(th)
-                o_cx_list.append(ocx)
-                o_cy_list.append(ocy)
+                if x is not None:
+                    x_angle_list.append(x)
+                    p_x = x
+                else:
+                    x_angle_list.append(p_x)
+
+                if y is not None:
+                    y_angle_list.append(y)
+                    p_y = y
+                else:
+                    y_angle_list.append(p_y)
+
+                if tilt_angle is not None:
+                    tilt_angle_list.append(tilt_angle)
+                    p_tilt_angle = tilt_angle
+                else:
+                    tilt_angle_list.append(p_tilt_angle)
+
+                if tw is not None:
+                    t_w_list.append(tw)
+                    p_tw = tw
+                else:
+                    t_w_list.append(p_tw)
+
+                if th is not None:
+                    t_h_list.append(th)
+                    p_th = th
+                else:
+                    t_h_list.append(p_th)
+
+                if ocx is not None:
+                    o_cx_list.append(ocx)
+                    p_ocx = ocx
+                else:
+                    o_cx_list.append(p_ocx)
+
+                if ocy is not None:
+                    o_cy_list.append(ocy)
+                    p_ocy = ocy
+                else:
+                    o_cy_list.append(p_ocy)
+
             else:
                 break
             pbar.update(1)
+
     an_cap.release()
 
     print("Processing video " + fileName + " ...")
