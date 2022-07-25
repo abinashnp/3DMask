@@ -14,12 +14,6 @@ def dot(vA, vB):
 
 
 def overlay_transparent(bg, overlay, px, py):
-    if px < 0:
-        px = 0
-
-    if py < 0:
-        py = 0
-
     b_width = bg.shape[1]
     b_height = bg.shape[0]
 
@@ -33,6 +27,9 @@ def overlay_transparent(bg, overlay, px, py):
 
     if padding_x < o_width / 2 or padding_y < o_height / 2:
         nL = 0
+
+    if px < 0 or py < 0:
+        nL = b_width
 
     x = px + nL
     y = py + nL
