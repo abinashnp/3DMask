@@ -52,13 +52,16 @@ class FaceMeshModule:
         y = (int(yangle / 2) * 2)
         fname = os.path.join(os.getcwd(), 'src', 'utils', 'imgs', str(filtername),
                              str(filtername) + '_' + str(x) + '_' + str(y) + '.jpg')
-
         mimg = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
 
         if tw > th:
             nw = tw
         else:
             nw = th
+
+        if nw == 0:
+            print("returned")
+            return img
 
         mimg = cv2.resize(mimg, (int(nw * hor_s), int(nw * ver_s)))
 
@@ -92,13 +95,16 @@ class FaceMeshModule:
     def apply_filter(self, img, x_angle, y_angle, tiltangle, tw, th, ocx, ocy, filtername="hat"):
         modelName, albedoName, scalefactor, xdeflection, ydeflection, idA, idB, cameraeye, hor_s, ver_s, _, trim, threshold = filterconfig.get_config(
             filtername)
-        return self.insert_overlay(img=img, tiltangle=tiltangle - 90,
-                                   tw=tw,
-                                   th=th,
-                                   oCx=ocx,
-                                   oCy=ocy, xangle=x_angle, yangle=y_angle, hor_s=hor_s,
-                                   ver_s=ver_s,
-                                   filtername=filtername,
-                                   trim=trim,
-                                   threshold=threshold
-                                   )
+        if tw == 0 or th == 0:
+            return img
+        else:
+            return self.insert_overlay(img=img, tiltangle=tiltangle - 90,
+                                       tw=tw,
+                                       th=th,
+                                       oCx=ocx,
+                                       oCy=ocy, xangle=x_angle, yangle=y_angle, hor_s=hor_s,
+                                       ver_s=ver_s,
+                                       filtername=filtername,
+                                       trim=trim,
+                                       threshold=threshold
+                                       )

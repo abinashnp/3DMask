@@ -155,8 +155,10 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     x_angle_list = smooth_data_moving_average(x_angle_list, 3)
     y_angle_list = smooth_data_moving_average(y_angle_list, 3)
     tilt_angle_list = smooth_data_moving_average(tilt_angle_list, 5)
+
     t_w_list = smooth_data_moving_average(t_w_list, window_size)
     t_h_list = smooth_data_moving_average(t_h_list, window_size)
+
     o_cx_list = smooth_data_moving_average(o_cx_list, window_size)
     o_cy_list = smooth_data_moving_average(o_cy_list, window_size)
 
