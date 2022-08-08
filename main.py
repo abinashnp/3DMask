@@ -12,6 +12,13 @@ if __name__ == "__main__":
                         help='Name of the file')
     parser.add_argument('--mask', default='hat',
                         help='Mask Names : \n1. hat\n2. pirate\n3. hippie\n4. viking')
+
+    parser.add_argument('--w', default=0,
+                        help='Width')
+
+    parser.add_argument('--h', default=0,
+                        help='Height')
+
     args = parser.parse_args()
 
     print("Starting AR Mask")
@@ -31,4 +38,9 @@ if __name__ == "__main__":
         print(file_name + " is not a video file")
         exit()
 
-    armask.process(file_name, mask_name)
+    should_resize = False
+
+    if int(args.w) > 0 and int(args.h) > 0:
+        should_resize = True
+
+    armask.process(file_name, mask_name, should_resize=should_resize, w=int(args.w), h=int(args.h))

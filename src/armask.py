@@ -6,7 +6,6 @@ from tqdm import tqdm
 import cv2
 import moviepy.editor as mp
 from moviepy.editor import *
-import ffmpeg
 
 
 def smooth_data_moving_average(array, window):
@@ -36,7 +35,7 @@ def smooth_data_moving_average(array, window):
     return moving_averages
 
 
-def start(fileName, out_name, mask, shouldFlip, window_size):
+def start(fileName, out_name, mask, shouldFlip, window_size, should_resize, w, h):
     print("Analyzing video " + fileName + " ...")
 
     video = mp.VideoFileClip(fileName)
@@ -45,7 +44,7 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     if video.audio:
         has_audio = True
         video.audio.write_audiofile("temp.mp3")
-    # Capture video for analyzing
+
     an_cap = cv2.VideoCapture(fileName)
 
     # frame per second of original video
@@ -63,11 +62,18 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     # Read image width and height
     img_height, img_width, _ = img.shape
 
+    i_height = img_height
+    i_width = img_width
+
+    if should_resize is True:
+        i_height = h
+        i_width = w
+
     # Initialize output video writer
     if has_audio:
-        writer = cv2.VideoWriter("temp.mp4", cv2.VideoWriter_fourcc(*'DIVX'), int(fps), (img_width, img_height))
+        writer = cv2.VideoWriter("temp.mp4", cv2.VideoWriter_fourcc(*'DIVX'), int(fps), (i_width, i_height))
     else:
-        writer = cv2.VideoWriter(out_name, cv2.VideoWriter_fourcc(*'DIVX'), int(fps), (img_width, img_height))
+        writer = cv2.VideoWriter(out_name, cv2.VideoWriter_fourcc(*'DIVX'), int(fps), (i_width, i_height))
 
     """Data Array Initialization"""
     x_angle_list = []
@@ -77,6 +83,7 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     t_h_list = []
     o_cx_list = []
     o_cy_list = []
+    frame_available = []
 
     # Re-initialize video
     an_cap = cv2.VideoCapture(fileName)
@@ -139,9 +146,11 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
 
                 if ocy is not None:
                     o_cy_list.append(ocy)
+                    frame_available.append(True)
                     p_ocy = ocy
                 else:
                     o_cy_list.append(p_ocy)
+                    frame_available.append(False)
 
             else:
                 break
@@ -172,18 +181,24 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
         while an_cap.isOpened():
 
             success, img = an_cap.read()
-            if shouldFlip is True:
-                img = cv2.flip(img, 1)
-            if success:
-                img = mesh.apply_filter(img,
-                                        x_angle=int(x_angle_list[frame]),
-                                        y_angle=int(y_angle_list[frame]),
-                                        tiltangle=tilt_angle_list[frame],
-                                        tw=int(t_w_list[frame]),
-                                        th=int(t_h_list[frame]),
-                                        ocx=int(o_cx_list[frame]),
-                                        ocy=int(o_cy_list[frame]), filtername=mask)
 
+            if success:
+
+                if shouldFlip is True:
+                    img = cv2.flip(img, 1)
+
+                if frame_available[frame]:
+                    img = mesh.apply_filter(img,
+                                            x_angle=int(x_angle_list[frame]),
+                                            y_angle=int(y_angle_list[frame]),
+                                            tiltangle=tilt_angle_list[frame],
+                                            tw=int(t_w_list[frame]),
+                                            th=int(t_h_list[frame]),
+                                            ocx=int(o_cx_list[frame]),
+                                            ocy=int(o_cy_list[frame]), filtername=mask)
+
+                if should_resize is True:
+                    img = cv2.resize(img, (i_width, i_height))
                 frame = frame + 1
                 writer.write(img)
             else:
@@ -208,11 +223,12 @@ def start(fileName, out_name, mask, shouldFlip, window_size):
     cv2.destroyAllWindows()
 
 
-def process(file_name=os.getcwd() + '/sample.mp4', mask="hat"):
+def process(file_name=os.getcwd() + '/sample.mp4', mask="hat", should_resize=False, w=0, h=0):
     print(os.getcwd())
     f_name = file_name.split(".")[0]
     ext = file_name.split(".")[1]
     out_name = f_name + "_out." + ext
     should_flip = False
     window_size = 3
-    start(file_name, out_name, mask, should_flip, window_size)
+    print(w, h)
+    start(file_name, out_name, mask, should_flip, window_size, should_resize, w, h)

@@ -12,8 +12,8 @@ class FaceMeshModule:
         super().__init__()
 
         self.face_mesh = mp.solutions.face_mesh
-        self.mesh = self.face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=False, min_tracking_confidence=0.2,
-                                            min_detection_confidence=0.2)
+        self.mesh = self.face_mesh.FaceMesh(max_num_faces=1, refine_landmarks=False, min_tracking_confidence=0.05,
+                                            min_detection_confidence=0.05)
         self.prev_t_w = None
         self.prevth = None
 
