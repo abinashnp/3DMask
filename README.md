@@ -21,6 +21,6 @@
 ```pip install -r requirements.txt```
 - Agree any conditions that the program throws at you
 - After successful installation run the program using following command
-```python main.py --file [File Name] --mask [Mask Name]```
+```python main.py --file [File Name] --mask [Mask Name] --w [Width] --h[Height]```
 - You can also type following command to get help for command line instruction
 ```python main.py --help```
